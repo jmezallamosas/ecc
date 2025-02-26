@@ -6,6 +6,9 @@ from Bio.Seq import Seq
 import pandas as pd
 import numpy as np
 
+SHORTEST_SGRNA = 16
+LONGEST_SGRNA = 26
+
 # import the c. elegans genome from multiple FASTA files into one single sequence
 def get_seq(genome_dir):
     combined_seq = Seq("")
@@ -38,7 +41,7 @@ def get_TSSs(gene_name):
     
     return(prim_TSS, sec_TSS, strand[0])
 
-def __get_seqs__(seq, strand, gene_strand, SHORTEST_SGRNA, LONGEST_SGRNA, prim_TSS, sec_TSS, max_distance):
+def __get_seqs__(seq, strand, gene_strand, prim_TSS, sec_TSS, max_distance):
     output_list = []
     
     # 1 for same strand, -1 for opposite
@@ -50,7 +53,7 @@ def __get_seqs__(seq, strand, gene_strand, SHORTEST_SGRNA, LONGEST_SGRNA, prim_T
     
     for i in parse_range:
         if (seq[i] == "G" and seq[i - strand] == "G"):
-            current_seq = seq[np.max((i - LONGEST_SGRNA - 2, 0)):i - 1]
+            current_seq = seq[np.max((i - LONGEST_SGRNA - 2, 0)):i - 2]
             
             for j in range(LONGEST_SGRNA - SHORTEST_SGRNA):
                 if current_seq[j] == "G":
@@ -67,26 +70,27 @@ def __get_seqs__(seq, strand, gene_strand, SHORTEST_SGRNA, LONGEST_SGRNA, prim_T
                 
 
 # given the location of the primary and secondary TSS, determine all possible sgRNA locations within a certain distance
-def get_all_sgRNA_sequences(prim_TSS, sec_TSS, max_distance, genome, gene_strand, SHORTEST_SGRNA = 16, LONGEST_SGRNA = 26):
+def get_all_sgRNA_sequences(prim_TSS, sec_TSS, max_distance, genome, gene_strand, ):
     seq_front = genome[(prim_TSS - max_distance - 1):(prim_TSS + max_distance - 1)]
     seq_rev = seq_front.reverse_complement()
     
-    forward_list = __get_seqs__(seq_front, 1, gene_strand, SHORTEST_SGRNA, LONGEST_SGRNA, prim_TSS, sec_TSS, max_distance)
-    reverse_list = __get_seqs__(seq_rev, -1, gene_strand, SHORTEST_SGRNA, LONGEST_SGRNA, prim_TSS, sec_TSS, max_distance)
+    forward_list = __get_seqs__(seq_front, 1, gene_strand, prim_TSS, sec_TSS, max_distance)
+    reverse_list = __get_seqs__(seq_rev, -1, gene_strand, prim_TSS, sec_TSS, max_distance)
     
     return pd.concat([pd.DataFrame(forward_list), pd.DataFrame(reverse_list)])
 
-CONV_STRAND = {"+": 1, "-": -1}
+CONV_STRAND = {"+": 1, "-": -1} # better way to write this?
 
 def main():
-    genome_dir = "../genomes/c_elegans_n2"
-    gene_name = "Y53C10A.12.1" # gene name for hsf-1    
+    genome_dir = "../genomes/c_elegans_n2" # directory for c. elegans genome
+    gene_name = "Y53C10A.12.1" # gene name for hsf-1
     
     genome = get_seq(genome_dir)
     prim_TSS, sec_TSS, strand = get_TSSs(gene_name)
     
     potential_sgRNAs = get_all_sgRNA_sequences(prim_TSS, sec_TSS, 1000, genome, CONV_STRAND[strand])
-    potential_sgRNAs.to_csv("testing.csv", index = False)
+    potential_sgRNAs.to_csv("scoring_model/data/all_possible_sgRNAs.csv", index = False) 
+    # strand targeted != strand that the sgRNA is designed for, by the naming convention used here
 
 if __name__ == "__main__":
     main()
