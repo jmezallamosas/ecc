@@ -6,8 +6,8 @@ from Bio.Seq import Seq
 import pandas as pd
 import numpy as np
 
-SHORTEST_SGRNA = 16
-LONGEST_SGRNA = 26
+SHORTEST_SGRNA = 18
+LONGEST_SGRNA = 25
 
 # import the c. elegans genome from multiple FASTA files into one single sequence
 def get_seq(genome_dir):
@@ -53,7 +53,12 @@ def __get_seqs__(seq, strand, gene_strand, prim_TSS, sec_TSS, max_distance):
     
     for i in parse_range:
         if (seq[i] == "G" and seq[i - strand] == "G"):
-            current_seq = seq[np.max((i - LONGEST_SGRNA - 2, 0)):i - 2]
+            # i have absolutely 0 idea why this is needed, but its the only way i could get it to work
+            if strand == 1:
+                shifter = -2
+            else:
+                shifter = -1
+            current_seq = seq[np.max((i - LONGEST_SGRNA + shifter, 0)):i + shifter]
             
             for j in range(LONGEST_SGRNA - SHORTEST_SGRNA):
                 if current_seq[j] == "G":
@@ -77,6 +82,7 @@ def get_all_sgRNA_sequences(prim_TSS, sec_TSS, max_distance, genome, gene_strand
     forward_list = __get_seqs__(seq_front, 1, gene_strand, prim_TSS, sec_TSS, max_distance)
     reverse_list = __get_seqs__(seq_rev, -1, gene_strand, prim_TSS, sec_TSS, max_distance)
     
+    # return pd.DataFrame(forward_list)
     return pd.concat([pd.DataFrame(forward_list), pd.DataFrame(reverse_list)])
 
 CONV_STRAND = {"+": 1, "-": -1} # better way to write this?
