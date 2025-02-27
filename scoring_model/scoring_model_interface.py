@@ -60,7 +60,7 @@ def __get_seqs__(seq, strand, gene_strand, prim_TSS, sec_TSS, max_distance):
                 shifter = -1
             current_seq = seq[np.max((i - LONGEST_SGRNA + shifter, 0)):i + shifter]
             
-            for j in range(LONGEST_SGRNA - SHORTEST_SGRNA):
+            for j in range(LONGEST_SGRNA - SHORTEST_SGRNA + 1):
                 if current_seq[j] == "G":
                     pam_loc = prim_TSS + ((max_distance - i) * -strand) - np.abs(strand - 1)
                     output_list.append({
