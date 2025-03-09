@@ -63,29 +63,39 @@ def __get_seqs__(seq, strand, gene_strand, prim_TSS, sec_TSS, max_distance):
             for j in range(LONGEST_SGRNA - SHORTEST_SGRNA + 1):
                 if current_seq[j] == "G":
                     pam_loc = prim_TSS + ((max_distance - i) * -strand) - np.abs(strand - 1)
-                    output_list.append({
-                        "seq": "".join(current_seq[j:]),
-                        "strand": strand,
-                        "PAMloc": pam_loc,
-                        "PAMdist_prim": same_strand * strand * (pam_loc - prim_TSS), # PLEASE double check this
-                        "PAMdist_sec": same_strand * strand * (pam_loc - sec_TSS),
-                    })
+                    obs_seq = "".join(current_seq[j:])
+                    
+                    # this if gate is to get rid of some edge cases where sequences were far too short at the ends of the observed region
+                    if (len(obs_seq) >= SHORTEST_SGRNA) and (len(obs_seq) <= LONGEST_SGRNA):
+                        output_list.append({
+                            "sequence": obs_seq,
+                            "strand": strand,
+                            "PAMloc": pam_loc,
+                            # including 5p and 3p distances as same for now, may change this in the future
+                            "prim_TSS_dist5p": same_strand * strand * (pam_loc - prim_TSS), # PLEASE double check this
+                            "prim_TSS_dist3p": same_strand * strand * (pam_loc - prim_TSS),
+                            "sec_TSS_dist5p": same_strand * strand * (pam_loc - sec_TSS),
+                            "sec_TSS_dist3p": same_strand * strand * (pam_loc - sec_TSS),
+                        })
                     
     return output_list
                 
 
 # given the location of the primary and secondary TSS, determine all possible sgRNA locations within a certain distance
 def get_all_sgRNA_sequences(prim_TSS, sec_TSS, max_distance, genome, gene_strand, ):
-    seq_front = genome[(prim_TSS - max_distance - 1):(prim_TSS + max_distance - 1)]
+    seq_front = genome[(prim_TSS - max_distance - 1 - LONGEST_SGRNA):(prim_TSS + max_distance - 1 + LONGEST_SGRNA)]
     seq_rev = seq_front.reverse_complement()
     
-    forward_list = __get_seqs__(seq_front, 1, gene_strand, prim_TSS, sec_TSS, max_distance)
-    reverse_list = __get_seqs__(seq_rev, -1, gene_strand, prim_TSS, sec_TSS, max_distance)
+    forward_list = __get_seqs__(seq_front, 1, gene_strand, prim_TSS, sec_TSS, max_distance + LONGEST_SGRNA)
+    reverse_list = __get_seqs__(seq_rev, -1, gene_strand, prim_TSS, sec_TSS, max_distance + LONGEST_SGRNA)
     
     # return pd.DataFrame(forward_list)
     return pd.concat([pd.DataFrame(forward_list), pd.DataFrame(reverse_list)])
 
-CONV_STRAND = {"+": 1, "-": -1} # better way to write this?
+# better way to write this?
+def conv_strand(str) :
+    CONV_STRAND = {"+": 1, "-": -1}
+    return CONV_STRAND[str]
 
 def main():
     genome_dir = "../genomes/c_elegans_n2" # directory for c. elegans genome
@@ -94,7 +104,7 @@ def main():
     genome = get_seq(genome_dir)
     prim_TSS, sec_TSS, strand = get_TSSs(gene_name)
     
-    potential_sgRNAs = get_all_sgRNA_sequences(prim_TSS, sec_TSS, 1000, genome, CONV_STRAND[strand])
+    potential_sgRNAs = get_all_sgRNA_sequences(prim_TSS, sec_TSS, 1000, genome, conv_strand(strand))
     potential_sgRNAs.to_csv("scoring_model/data/all_possible_sgRNAs.csv", index = False) 
     # strand targeted != strand that the sgRNA is designed for, by the naming convention used here
 

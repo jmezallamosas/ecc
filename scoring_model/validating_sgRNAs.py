@@ -2,7 +2,6 @@
 # without any mismatches
 
 import pandas as pd
-import numpy as np
 import subprocess
 
 df = pd.read_csv("scoring_model/data/test_sgRNA_sequences.csv")
