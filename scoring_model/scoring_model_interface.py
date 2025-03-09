@@ -48,8 +48,6 @@ def __get_seqs__(seq, strand, gene_strand, prim_TSS, sec_TSS, max_distance):
     same_strand = (strand == gene_strand) * 2 - 1
     
     parse_range = range(SHORTEST_SGRNA + 3, len(seq))
-    if strand == 1:
-        parse_range = reversed(parse_range)
     
     for i in parse_range:
         if (seq[i] == "G" and seq[i - strand] == "G"):
@@ -69,7 +67,7 @@ def __get_seqs__(seq, strand, gene_strand, prim_TSS, sec_TSS, max_distance):
                     if (len(obs_seq) >= SHORTEST_SGRNA) and (len(obs_seq) <= LONGEST_SGRNA):
                         output_list.append({
                             "sequence": obs_seq,
-                            "strand": strand,
+                            "strand": strand * -1, # inverse, because strand targeted is opposite of strand sequence is designed for
                             "PAMloc": pam_loc,
                             # including 5p and 3p distances as same for now, may change this in the future
                             "prim_TSS_dist5p": same_strand * strand * (pam_loc - prim_TSS), # PLEASE double check this

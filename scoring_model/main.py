@@ -6,7 +6,10 @@ import pandas as pd
 
 def main(targeted_gene, longest_dist = 1000, dir = "../genomes/c_elegans_n2"):    
     genome = get_seq(dir)
-    prim_TSS, sec_TSS, strand = get_TSSs(targeted_gene)
+    # prim_TSS, sec_TSS, strand = get_TSSs(targeted_gene)
+    prim_TSS = 44281043
+    sec_TSS = 44281043
+    strand = "-"
                                          
     potential_sgRNAs = get_all_sgRNA_sequences(prim_TSS, sec_TSS, longest_dist, genome, conv_strand(strand))
     

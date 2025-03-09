@@ -1,8 +1,6 @@
 import pickle
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-THRESHOLD = 0.75
-
 # preprocess data, putting some features into standard scaling and others into minmax scaling
 def preprocess_data(X):
     stan = StandardScaler()
