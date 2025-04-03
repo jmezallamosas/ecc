@@ -28,12 +28,12 @@ def model_data(X, model_dir):
     return y
 
 # given a dataframe of sgRNAs and a targeted strand, determine the scores for each of the sgRNAs
-def score_sgRNAs(df, strand):
+def score_sgRNAs(df, strand, model_dir):
     df["same_strand"] = (df["strand"] == strand).astype(int)
     
     X = df.drop(columns = ["PAMloc", "strand", "sequence", "struct"])
     
     X_scaled = preprocess_data(X)
-    y = model_data(X_scaled, "scoring_model/models/LGBM.pk1")
+    y = model_data(X_scaled, model_dir)
     
     return y

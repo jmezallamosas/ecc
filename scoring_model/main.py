@@ -6,16 +6,14 @@ import pandas as pd
 
 def main(targeted_gene, longest_dist = 1000, dir = "../genomes/c_elegans_n2"):    
     genome = get_seq(dir)
-    # prim_TSS, sec_TSS, strand = get_TSSs(targeted_gene)
-    prim_TSS = 44281043
-    sec_TSS = 44281043
-    strand = "-"
+    prim_TSS, sec_TSS, strand = get_TSSs(targeted_gene)
                                          
     potential_sgRNAs = get_all_sgRNA_sequences(prim_TSS, sec_TSS, longest_dist, genome, conv_strand(strand))
+    print(potential_sgRNAs)
     
     structured_df = structure_dataframe(potential_sgRNAs.copy(), dir)
     
-    score_df = score_sgRNAs(structured_df, strand)
+    score_df = score_sgRNAs(structured_df, strand, "scoring_model/models/LGBM.pk1") # model directory specified
     outcome_df = pd.concat([potential_sgRNAs.reset_index(drop = True), pd.DataFrame({"score": score_df})], axis = 1)
     outcome_df = outcome_df.sort_values(by = "score", ascending = False)
     
@@ -34,7 +32,7 @@ def parse_args():
     return parser.parse_args()
     
 if __name__ == "__main__":
-    # main("Y53C10A.12.1")
+    main("Y53C10A.12.1")
     
-    args = parse_args()
-    main(args.targeted_gene, args.longest_dist, args.dir)
+    # args = parse_args()
+    # main(args.targeted_gene, args.longest_dist, args.dir)
