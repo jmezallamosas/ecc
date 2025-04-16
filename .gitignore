@@ -2,4 +2,4 @@
 scoring_model/.ipynb_checkpoints/
 LLM_business/.ipynb_checkpoints/
 scoring_model/__pycache__
-temp_dir
+temp_dir/*
