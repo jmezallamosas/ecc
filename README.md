@@ -33,3 +33,5 @@ Usage of the model should be as simple as running main.py. As is given in the ma
 - --dir: directory of genome. The default is "../genomes//c_elegans_n2"
 
 Name of gene is specified as a required argument of the script.
+
+All model outputs are generated to "temp_dir". "input.txt" and "output.txt" are left behind by Cas-OFFinder and can be ignored.
