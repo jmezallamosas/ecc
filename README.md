@@ -24,7 +24,7 @@ Scoring model is split into the following files:
   - cas-offinder.exe: executable to run cas-offinder for off-target scoring of sgRNAs
 
 IMPORTANT NOTES:
-- Genomes are required to be downloaded separately from this repository. *C. elegans* genome used for this model is N2. Model directory is specified in main.py using the "--dir" argument. Default directory is "../genomes/c_elegans_n2". For easiest installation of genome FASTA files, contact Jackson Rutecki at jackson.rutecki@gmail.com
+- Genomes are required to be downloaded separately from this repository. *C. elegans* genome used for this model is N2. Model directory is specified in main.py using the "--dir" argument. Default directory is "../genomes/c_elegans_n2". For easiest installation of genome FASTA files, downlaod at (https://ftp.ensembl.org/pub/release-113/fasta/caenorhabditis_elegans/dna/) or contact Jackson Rutecki at jackson.rutecki@gmail.com
 
 ## Usage of the model
 
