@@ -13,8 +13,8 @@ Scoring model is split into the following files:
   - models: containing all fitted models
 - Jupyter Notebook Files
   - structuring_data.ipynb: initial notebook for looking at ways to generate features from sequences
-  - ML_models.ipynb: initial notebook for looking at different model structures
-  - validiting_exp_data.ipynb: exploratory analysis on experimental data
+  - ML_models.ipynb: initial notebook for looking at different model structures. **Includes all results for all tested models from initial data**.
+  - validiting_exp_data.ipynb: exploratory analysis on experimental data. **Includes all results from refitting model to experimental data**.
 - Python files
   - scoring_model_interface.py: reads in a target gene and generates all possible sgRNAs based on the PAM (NGG) and 1000 bps in either direction of the TSS of the target gene - returns all of these to be used in later functions
   - structuring_data.py: functions used in structuring_data - takes in all sgRNAs and sequences and creates all features
